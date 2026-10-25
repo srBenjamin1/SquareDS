@@ -72,7 +72,7 @@ Pendiente de validación interactiva del usuario: reproducción continua y cambi
 - [Cadena de entrega y renderizado normal](validation/MOTION-ALBUM-RENDER-TRACE.txt).
 - [Ensayo táctil de modos con identidad de actividades y conservación de sesión](validation/THOR-LOWER-MODE-INSTRUMENTED.txt).
 - [Actividades por display](validation/THOR-LOWER-DISPLAY-ACTIVITIES.txt): ThorActivity visible abajo y launcher arriba durante el modo inferior; [sesiones de SquareDS: una](validation/THOR-LOWER-SESSION-COUNT.txt).
-- [Interfaz inferior con cola y controles](screenshots/motion-album-lower/thor-lower-player-queue.png); [recurso de Mama renderizado por el probe](screenshots/motion-album-lower/mama-first-frame-probe.png).
+- Interfaz inferior con cola y controles (captura retirada del repositorio); recurso de Mama renderizado por el probe (captura retirada del repositorio).
 
 Una repetición del runner encontró un selector de accesibilidad ambiguo. Se acotó al paquete SquareDS, nodos visibles y zona de pestañas; la repetición final pasó. No fue un cierre de la aplicación. Se retiraron el runner temporal y sus capturas de la caché del dispositivo; se dejó la app en modo dual, sin órdenes de reproducción.
 

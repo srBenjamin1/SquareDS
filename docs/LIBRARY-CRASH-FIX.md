@@ -73,9 +73,9 @@ El emulador se cierra tras guardar la evidencia; no había ningún dispositivo f
 
 ## Capturas
 
-- [Música local vacía](screenshots/library-crash-fix/library-local-empty.png) y [con álbum](screenshots/library-crash-fix/library-local-populated.png).
-- [Spotify vacía](screenshots/library-crash-fix/library-spotify-empty.png) y [con playlist de prueba](screenshots/library-crash-fix/library-spotify-populated.png).
-- [YouTube Music vacía](screenshots/library-crash-fix/library-youtube_music-empty.png) y [con playlist de prueba](screenshots/library-crash-fix/library-youtube_music-populated.png).
+- Música local vacía (captura retirada del repositorio) y con álbum (captura retirada del repositorio).
+- Spotify vacía (captura retirada del repositorio) y con playlist de prueba (captura retirada del repositorio).
+- YouTube Music vacía (captura retirada del repositorio) y con playlist de prueba (captura retirada del repositorio).
 
 
 ## Validación física pendiente

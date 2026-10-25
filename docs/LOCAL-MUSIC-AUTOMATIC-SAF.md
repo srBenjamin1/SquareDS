@@ -171,10 +171,10 @@ Estos son los archivos de esta fase; el estado Git incluye también cambios prev
 
 Capturas del emulador (datos sintéticos de prueba):
 
-- [album-landscape.png](screenshots/local-auto/album-landscape.png)
-- [album-scroll.png](screenshots/local-auto/album-scroll.png)
-- [artista-rechazado.png](screenshots/local-auto/artista-rechazado.png)
-- [carpetas-seleccionadas.png](screenshots/local-auto/carpetas-seleccionadas.png)
-- [inicio-landscape.png](screenshots/local-auto/inicio-landscape.png)
-- [saf-sin-permiso-media.png](screenshots/local-auto/saf-sin-permiso-media.png)
-- [vuelta-modo-general.png](screenshots/local-auto/vuelta-modo-general.png)
+- album-landscape.png (captura retirada del repositorio)
+- album-scroll.png (captura retirada del repositorio)
+- artista-rechazado.png (captura retirada del repositorio)
+- carpetas-seleccionadas.png (captura retirada del repositorio)
+- inicio-landscape.png (captura retirada del repositorio)
+- saf-sin-permiso-media.png (captura retirada del repositorio)
+- vuelta-modo-general.png (captura retirada del repositorio)

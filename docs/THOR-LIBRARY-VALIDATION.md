@@ -22,7 +22,7 @@ Pruebas mediante tacto ADB en la pantalla inferior, con el reproductor en la sup
 | YouTube Music | 8 playlists; filtro Álbumes vacío | Biblioteca, filtros y desplazamiento |
 | Música local | 30 canciones, 3 álbumes | Biblioteca, detalle y retorno del álbum, filtros Artistas y Canciones |
 
-Con el APK final se comprobaron Spotify → local y YouTube Music → local sin reiniciar el proceso. Ambos abren Biblioteca local correctamente. [Captura tras Spotify](screenshots/library-thor/v2-local-after-spotify.png), [tras YouTube](screenshots/library-thor/v2-local-after-youtube.png), [Spotify](screenshots/library-thor/v2-spotify-albums.png), [YouTube](screenshots/library-thor/v2-youtube-library.png), [álbum local](screenshots/library-thor/v2-local-album-detail.png).
+Con el APK final se comprobaron Spotify → local y YouTube Music → local sin reiniciar el proceso. Ambos abren Biblioteca local correctamente. Captura tras Spotify (captura retirada del repositorio), tras YouTube (captura retirada del repositorio), Spotify (captura retirada del repositorio), YouTube (captura retirada del repositorio), álbum local (captura retirada del repositorio).
 
 El PID 5540 permaneció vivo durante toda la matriz final; su buffer de crash no contiene FATAL EXCEPTION. [Buffer final](validation/THOR-LIBRARY-LATEST-CRASH-BUFFER.txt). Se dejó la app en Inicio de Spotify, restaurando la fuente original. No se ordenó reproducir ni se borraron canciones, cuentas o playlists. Se retiró el XML temporal de UiAutomator.
 

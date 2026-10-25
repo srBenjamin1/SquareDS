@@ -116,11 +116,11 @@ La auditoría se completó mediante las solicitudes normales de la app y sus [lo
 
 ## Evidencia visual
 
-- [Menú convencional horizontal](screenshots/local-corrections/menu-conventional-landscape.png).
-- [Menú convencional vertical](screenshots/local-corrections/menu-conventional-portrait.png).
-- [Menú Thor horizontal](screenshots/local-corrections/menu-thor-landscape.png).
-- [Menú Thor vertical](screenshots/local-corrections/menu-thor-portrait.png).
-- [Contenido detrás de los controles](screenshots/local-corrections/grid-start-landscape.png).
-- [Última tarjeta con mini-reproductor](screenshots/local-corrections/grid-end-landscape.png).
-- [Inicio sin mini-reproductor](screenshots/local-corrections/grid-start-no-mini.png).
-- [Última tarjeta sin mini-reproductor](screenshots/local-corrections/grid-end-no-mini.png).
+- Menú convencional horizontal (captura retirada del repositorio).
+- Menú convencional vertical (captura retirada del repositorio).
+- Menú Thor horizontal (captura retirada del repositorio).
+- Menú Thor vertical (captura retirada del repositorio).
+- Contenido detrás de los controles (captura retirada del repositorio).
+- Última tarjeta con mini-reproductor (captura retirada del repositorio).
+- Inicio sin mini-reproductor (captura retirada del repositorio).
+- Última tarjeta sin mini-reproductor (captura retirada del repositorio).
