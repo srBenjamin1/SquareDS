@@ -173,9 +173,9 @@ SquareDS can move its player to the lower display while leaving the upper screen
 
 ### Apple Music Motion Artwork
 
-Animated album artwork in the SquareDS player.
+Animated album artwork running on the AYN Thor.
 
-**[Watch the Motion Artwork demonstration](https://github.com/srBenjamin1/SquareDS/blob/master/docs/screenshots/Motion%20Artwork.mp4)**
+![Apple Music Motion Artwork on AYN Thor](docs/screenshots/Motion-Artwork.gif)
 
 ### Music video playback
 
