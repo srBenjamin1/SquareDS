@@ -79,8 +79,6 @@ The default dual-screen presentation is restored when the application process re
 
 Real photos of SquareDS running on the AYN Thor.
 
-![SquareDS running on AYN Thor](docs/screenshots/IMG_20261020_041622466.jpg)
-
 ![SquareDS dual-screen experience on AYN Thor](docs/screenshots/IMG_20261025_134427039.jpg)
 
 ### Navigation
@@ -115,11 +113,14 @@ SquareDS supports switching between music playback and compatible music videos.
 
 ### Additional screenshots
 
-| Music player | Navigation |
+| Dual-screen setup | Player interface |
 | :---: | :---: |
-| ![SquareDS original player interface](docs/screenshots/Screenshot_20261020-030401.png) | ![SquareDS original navigation interface](docs/screenshots/Screenshot_20261020-041140.png) |
+| ![SquareDS on AYN Thor](docs/screenshots/IMG_20261020_041622466.jpg) | ![SquareDS original player interface](docs/screenshots/Screenshot_20261020-030401.png) |
 
-![Additional SquareDS interface screenshot](docs/screenshots/Screenshot_20261020-0412072.jpg)
+| Original navigation | Additional interface |
+| :---: | :---: |
+| ![SquareDS original navigation interface](docs/screenshots/Screenshot_20261020-041140.png) | ![SquareDS additional interface screenshot](docs/screenshots/Screenshot_20261020-0412072.jpg) |
+---
 ## Features
 
 ### Music sources
