@@ -1,151 +1,198 @@
-# Square — DS
+# SquareDS
 
-**An unofficial fork of Square for dual-screen Android devices, tested on the AYN Thor.**
+**An unofficial fork of Square for dual-screen Android devices, developed and tested on the AYN Thor.**
 
-An unofficial YouTube Music / Spotify Premium client featuring a Liquid Glass interface, dedicated dual-screen playback, audio effects, Spotify Connect, listening history, and support for 8 languages. Powered by a Rust core built on librespot.
+SquareDS adapts [Square by Lelonio](https://github.com/Lelonio/Square), an unofficial Spotify Premium and YouTube Music client with a Liquid Glass interface, for dual-screen Android handhelds.
 
-Based on [Square by Lelonio](https://github.com/Lelonio/Square).
+It adds dedicated dual-screen playback, an organized local music library, controller navigation, Apple Music Motion Artwork support, and the option to run the full player on the lower display.
 
-[Download APK](https://github.com/srBenjamin1/Square/releases) · [Features](#features) · [Dual-screen mode](#dual-screen-mode) · [Installation](#installation) · [Original project](#original-project)
+The original Square features remain available, including Spotify Connect, synchronized lyrics, audio effects, listening history, and a Rust playback core based on librespot.
+
+**[Download SquareDS](https://github.com/srBenjamin1/SquareDS/releases) · [Features](#features) · [Screenshots](#screenshots) · [Installation](#installation) · [Original project](#original-project)**
 
 ---
 
-## About this fork
+## About SquareDS
 
-Square Dual Screen is a community-maintained adaptation of the original Square music player, designed to take advantage of Android devices with two independent displays.
+SquareDS started as an attempt to make better use of both screens on the AYN Thor.
 
-Instead of duplicating the same interface on both screens, the application separates music playback from navigation and playback tools.
+The idea came after seeing a Spotify client developed for the Nintendo 3DS. I had been looking for a music player that could take advantage of the Thor's two displays, and eventually discovered Square.
 
-The project aims to preserve Square's original Liquid Glass design, music services, audio engine, and functionality while providing a more natural experience on dual-screen handhelds.
+Rather than creating a completely new music player, I decided to adapt Square's existing interface and playback functionality.
 
-**Tested device:** AYN Thor, running its original Android firmware without root.
+SquareDS preserves the original project's Liquid Glass design while introducing layouts and controls designed around dual-screen handhelds.
 
-Compatibility with other dual-screen Android devices has not yet been verified. Display detection and behavior may vary depending on the device and firmware.
+**Tested device:** AYN Thor, using its original Android firmware without root.
 
-## Dual-screen mode
+Other dual-screen Android devices have not yet been verified.
 
-### Upper display — Dedicated music player
+## Dual-screen experience
 
-The upper screen provides a permanent, expanded music player.
+### Upper screen — Music player
 
-Features include:
+The upper display is dedicated to music playback.
 
 - Album artwork and playback controls.
-- Track title, artist, duration, and progress.
-- Synchronized lyrics with the original visual effects.
-- Lyrics translation and available karaoke controls.
-- Song favorites.
-- Spotify Connect access.
-- Dynamic colors and Liquid Glass effects.
+- Apple Music Motion Artwork in landscape.
+- Music video switching when supported.
+- Synchronized lyrics and translation.
+- Track information and interactive artist/album metadata.
+- Playback progress and queue controls.
+- Liquid Glass visual effects.
 
-The player remains expanded while browsing music on the lower display.
+The player stays visible while browsing music on the lower screen.
 
-### Lower display — Navigation and playback tools
+### Lower screen — Navigation
 
-The lower screen provides Square's original navigation experience.
+The lower display provides access to:
 
-It includes:
+- Home, New, Radio, Library, and Search, depending on the selected source.
+- Albums, artists, songs, and playlists.
+- Queue and playback controls.
+- Equalizer and audio effects.
+- Lyrics and song credits.
+- Settings and source selection.
 
-- Home, New, Radio, Library, and Search.
-- Albums, artists, and playlists.
-- A persistent mini-player during normal navigation.
-- An expandable playback tools panel.
+Navigation and playback share the same music session.
 
-The expanded panel provides access to:
+### Lower-screen-only mode
 
-- Playback queue.
-- Shuffle and repeat controls.
-- Song Radio.
-- Equalizer.
-- Audio effects.
-- Track information.
-- Playback settings.
+SquareDS also includes an optional mode that moves the full player interface to the lower display.
 
-Closing the tools panel restores the previous navigation view without interrupting playback.
+This allows the upper display to remain available for other applications, including games, depending on Android and launcher behavior.
 
-### Touchscreen and controller support
+The lower-screen player uses a landscape layout with:
 
-Both screens retain their touchscreen functionality.
+- Album artwork and playback controls.
+- Track information and progress.
+- Shuffle and repeat.
+- A separate lyrics or tools panel.
+- Access to the library and navigation.
 
-Controller-oriented navigation is under active development, including directional focus navigation, controller shortcuts, and contextual visual indicators inspired by handheld gaming interfaces.
+You can switch between dual-screen and lower-screen-only modes without restarting playback.
 
-The intended interaction model uses the D-Pad and left analog stick to navigate between interface elements, with a Liquid Glass focus indicator that disappears when switching to touch input.
-
-Controller functionality may vary between releases. Check the release notes for features that have been implemented and tested.
-
----
+The default dual-screen presentation is restored when the application process restarts.
 
 ## Screenshots
 
-Square Dual Screen running on the AYN Thor.
+SquareDS running on the AYN Thor.
+
+### Dual-screen interface
 
 | Dual-screen experience | Music player |
 | :---: | :---: |
-| ![AYN Thor screenshot 1](docs/screenshots/IMG_20261020_041622466.jpg) | ![AYN Thor screenshot 2](docs/screenshots/Screenshot_20261020-030401.png) |
+| ![SquareDS on AYN Thor](docs/screenshots/IMG_20261020_041622466.jpg) | ![SquareDS music player](docs/screenshots/Screenshot_20261020-030401.png) |
 
-| Interface | Additional view |
+| Navigation | Additional interface |
 | :---: | :---: |
-| ![AYN Thor screenshot 3](docs/screenshots/Screenshot_20261020-041140.png) | ![AYN Thor screenshot 4](docs/screenshots/Screenshot_20261020-0412072.jpg) |
+| ![SquareDS navigation](docs/screenshots/Screenshot_20261020-041140.png) | ![SquareDS interface](docs/screenshots/Screenshot_20261020-0412072.jpg) |
+
+### New features
+
+| Music sources | Local music |
+| :---: | :---: |
+| ![SquareDS music source selection](docs/screenshots/Fuentes.png) | ![SquareDS local music playback](docs/screenshots/ReproduccionLocal.png) |
+
+| Lower-screen-only mode | Motion Artwork |
+| :---: | :---: |
+| ![SquareDS lower-screen player](docs/screenshots/OnlyBottomScreen.png) | ![SquareDS Motion Artwork](docs/screenshots/Video-test.png) |
+
+### Additional screenshots
+
+| Screenshot 1 | Screenshot 2 | Screenshot 3 |
+| :---: | :---: | :---: |
+| ![AYN Thor additional screenshot](docs/screenshots/IMG_20261025_133443579.jpg) | ![AYN Thor additional screenshot](docs/screenshots/IMG_20261025_134427039.jpg) | ![AYN Thor additional screenshot](docs/screenshots/Screenshot_20261025-132951.png) |
+
+### Motion Artwork demonstration
+
+**[Watch the Apple Music Motion Artwork demo](docs/screenshots/Motion%20Artwork.mp4)**
+
+The video demonstrates animated artwork running in SquareDS top screen.
+
+---
 
 ## Features
 
-The fork retains the features of the original Square project, including:
+### Music sources
 
-### Music services
+SquareDS supports three music sources:
 
 **Spotify Premium**
 
-- Personal playlists and library.
+- Personal library and playlists.
 - Spotify Connect.
-- Listening history.
 - Music discovery and recommendations.
-- Song credits and supported Spotify features.
+- Listening history.
+- Supported music videos and song credits.
 
 **YouTube Music**
 
 - Music catalogue and search.
-- Optional Google account sign-in.
-- Personal playlists and albums.
+- Optional Google account authentication.
+- Albums, artists, and playlists.
 - Music videos and supported discovery features.
 
-### Playback
+**Local Music**
 
-- Dynamic album artwork and Canvas support.
-- Synchronized lyrics.
-- Song Radio and autoplay.
-- Crossfade.
-- Sleep timer.
+- Offline playback of music stored on the device.
+- Organized albums, artists, songs, genres, folders, and playlists.
+- Local music search and listening history.
+- Album artwork extracted from local files.
+- Artist photographs and logos from compatible catalogue matches.
+- Optional music-folder selection through Android's Storage Access Framework.
+- Apple Music Motion Artwork for compatible local albums.
+- Preservation of Square's original local file browser.
+
+Without manually selected folders, the local library discovers accessible music through Android's MediaStore.
+
+### Apple Music Motion Artwork
+
+SquareDS supports animated album artwork in the player, including landscape mode.
+
+For local music, the application attempts to identify the corresponding Apple Music album using album and artist metadata, with additional checks when necessary.
+
+When a suitable animated resource is available, it can be displayed without replacing the original embedded artwork.
+
+If no compatible resource is found, SquareDS continues displaying the static album cover.
+
+Availability depends on the Apple Music catalogue, connectivity, and the selected artwork preferences.
+
+### Controller navigation
+
+SquareDS includes controller-oriented navigation for the AYN Thor.
+
+- D-Pad and left analog stick navigation.
+- Liquid Glass focus indicators.
+- A to activate and B to go back.
+- Shoulder-button navigation shortcuts.
+- Touchscreen interaction preserved independently of controller focus.
+
+Controller support continues to be refined and may vary depending on the current screen or feature.
+
+### Playback and audio
+
+- Synchronized lyrics and translation.
 - Playback queue.
 - Shuffle and repeat.
-- Background playback.
-
-### Audio effects
-
-- Equalizer.
+- Crossfade and sleep timer.
+- Equalizer and audio effects.
 - Playback speed and pitch.
-- Reverb.
-- Audio effect presets.
-- Karaoke vocal reduction.
-- Streaming quality settings.
+- Reverb and audio presets.
+- Karaoke vocal reduction where supported.
+- Background playback.
+- Spotify Connect.
 
-### Library and offline listening
-
-- Playlists, albums, artists, and liked songs.
-- Search history.
-- Local music files.
-- Music downloads.
-- Offline playback.
-- Automatic downloads where supported.
+Some features depend on the selected music service.
 
 ### Interface
 
 - Liquid Glass materials.
-- Adjustable blur, refraction, and tint.
 - Dynamic colors.
+- Blur, refraction, and tint effects.
 - Floating navigation elements.
-- Eight languages: English, Italian, Spanish, French, German, Portuguese, Hindi, and Turkish.
-
-The availability of individual features depends on the selected music service and the capabilities of the original Square implementation.
+- Landscape layouts for dual-screen devices.
+- Interactive artist and album metadata.
+- Eight languages inherited from the original Square project, with additional localization work in the fork.
 
 ---
 
@@ -153,75 +200,70 @@ The availability of individual features depends on the selected music service an
 
 ### Requirements
 
-- Android 8.0 or later, according to the original Square minimum requirement.
-- An ARM64 Android device for the AYN Thor APK.
+- Android 8.0 or later.
+- A compatible Android device.
+- ARM64 APK recommended for AYN Thor.
 - Spotify Premium for Spotify playback.
-- An internet connection for streaming and initial service configuration.
+- Internet connection for streaming and online artwork features.
 
-Dual-screen operation requires a compatible Android multi-display configuration.
+Local music playback does not require an internet connection.
 
 ### Download
 
-Download the APK from:
+Download the latest version from:
 
-**[Square Dual Screen — GitHub Releases](https://github.com/srBenjamin1/Square/releases)**
+**[SquareDS — GitHub Releases](https://github.com/srBenjamin1/SquareDS/releases)**
 
-For AYN Thor, select the ARM64 APK when available.
+Available APK variants may include:
 
-Enable installation from the appropriate source in Android settings, then install the downloaded APK.
+- ARM64 (arm64-v8a) — recommended for AYN Thor.
+- ARMv7 (armeabi-v7a).
+- Universal.
 
-Development builds may be distributed as debug APKs. Android requires compatible signing certificates when updating an existing installation.
+Install the APK using Android's package installer.
 
-### Enable dual-screen mode
+Existing SquareDS installations can be updated without uninstalling when the package identifier, signing certificate, and Android version requirements are compatible.
 
-1. Install and open Square.
-2. Complete the initial Spotify or YouTube Music setup.
-3. Open Settings.
-4. Enable the AYN Thor / dual-screen option.
-5. Verify that the player appears on the upper display and navigation appears on the lower display.
+### Dual-screen configuration
 
-The dual-screen option is intended to operate without root or privileged Android permissions.
+1. Install and open SquareDS.
+2. Complete any required music-service setup.
+3. Open Settings and configure Thor dual-screen mode.
+4. Use the upper display for playback and the lower display for navigation.
+5. Switch to lower-screen-only mode when you want the full player below.
 
----
-
-## First launch
-
-Square asks which music service you want to use.
-
-**YouTube Music:** playback is available without signing in. Google account authentication is optional for personal library features.
-
-**Spotify:** a Premium account is required. The original Square setup also requires registering a Spotify developer application and configuring its client ID.
-
-Follow the setup instructions provided inside the application.
+The application does not require root or Shizuku.
 
 ---
 
 ## Development status
 
-This fork is under active development.
+SquareDS is an independently maintained community fork.
 
-The dual-screen playback interface and lower-screen navigation have been implemented and tested on AYN Thor.
+The following features have been implemented and tested to varying degrees on AYN Thor:
 
-Further work includes controller navigation, focus indicators, interface refinements, and compatibility testing on additional dual-screen devices.
+- Dual-screen playback.
+- Lower-screen navigation.
+- Local music library.
+- Controller navigation.
+- Landscape Motion Artwork.
+- Lower-screen-only player.
 
-Features that have not been validated on physical hardware should not be considered fully supported.
+Compatibility with other dual-screen devices remains unverified.
 
-Refer to each GitHub Release for the status of a particular build.
+Updates may take some time, as development is carried out during my available free time.
+
+Bug reports, testing feedback, and contributions are welcome.
+
+**[Issues](https://github.com/srBenjamin1/SquareDS/issues) · [Releases](https://github.com/srBenjamin1/SquareDS/releases)**
 
 ---
 
 ## Building from source
 
-The project uses Kotlin, Jetpack Compose, Gradle, Rust, Librespot, and the Android NDK.
+SquareDS uses Kotlin, Jetpack Compose, Gradle, Rust, Librespot, and the Android NDK.
 
-The current development environment uses:
-
-- Java 21.
-- Android SDK Platform 37.0.
-- Android NDK 30.0.16248370.
-- Rust with cargo-ndk.
-- CMake.
-- Gradle Wrapper.
+The development toolchain includes Java 21, the Android SDK, Android NDK, Rust with cargo-ndk, CMake, and the Gradle Wrapper.
 
 To build a debug APK:
 
@@ -229,63 +271,51 @@ To build a debug APK:
 ./gradlew :app:assembleDebug --no-configuration-cache
 ```
 
-The ARM64 debug APK is generated at:
+The ARM64 debug APK is normally generated at:
 
 ```text
 app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 ```
 
-Additional architecture, signing, and development instructions are available in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+See [Development documentation](docs/DEVELOPMENT.md) for additional information.
 
 ---
 
 ## Original project
 
-Square Dual Screen is an unofficial fork of:
+SquareDS is based on:
 
-**[Lelonio/Square](https://github.com/Lelonio/Square)**
+**[Square by Lelonio](https://github.com/Lelonio/Square)**
 
-The original application, its music integration, playback engine, Liquid Glass interface, and most of its functionality were developed by the original Square contributors.
+The original Square project and its contributors developed the music integrations, playback engine, Liquid Glass interface, and most of the application's underlying functionality.
 
-This fork focuses on adapting that existing application for dual-screen Android hardware.
+SquareDS focuses on adapting that work to dual-screen Android hardware and expanding the local music experience.
 
-For the original single-screen application, documentation, and releases, visit the upstream repository.
-
-This fork is independently maintained and is not an official release of the original Square project.
-
----
+This fork is independently maintained and is not an official release of Square.
 
 ## Disclaimer
 
-Square Dual Screen is not affiliated with, endorsed by, or connected to Spotify, Google, YouTube Music, or AYN.
+SquareDS is not affiliated with, endorsed by, or connected to Spotify, Google, YouTube Music, Apple, or AYN.
 
-It inherits the unofficial service integrations of Square, including Spotify protocol implementations and access to YouTube Music endpoints not offered as a public client API.
+It inherits unofficial service integrations from Square. These integrations may be affected by changes to third-party services or their terms of use.
 
-These integrations may conflict with service terms and may stop working when the providers change their systems.
-
-Use the application at your own risk.
-
-There is no warranty of any kind.
-
----
+Use the application at your own risk. No warranty is provided.
 
 ## Credits and acknowledgements
 
 Special thanks to [Lelonio](https://github.com/Lelonio) and all contributors to the original Square project.
 
-The fork continues to rely on the original project's dependencies and contributions, including:
+The project also relies on work from:
 
 - [librespot](https://github.com/librespot-org/librespot) — Spotify playback engine.
 - [Metrolist](https://github.com/mostafaalagamy/Metrolist) — InnerTube integration.
 - [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor) — YouTube extraction.
 - [Spicy Lyrics](https://github.com/Spikerko/spicy-lyrics) — Lyrics presentation.
-- [AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass) — Glass material.
+- [AndroidLiquidGlass](https://github.com/Kyant0/AndroidLiquidGlass) — Liquid Glass materials.
 - [Phosphor Icons](https://phosphoricons.com) — Iconography.
 - [Bungee](https://github.com/kupix/bungee) — Time stretching.
 
-The original README and repository contain additional dependency credits, licensing details, and acknowledgements that should be retained.
-
----
+Additional credits and licensing information are available in the original Square repository.
 
 ## License
 
