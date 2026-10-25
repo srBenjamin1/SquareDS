@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
 
     private var controller by mutableStateOf<MediaController?>(null)
     private var thorPlayerMode by mutableStateOf(false)
+    private var lowerOnly by mutableStateOf(false)
     private val thorModeReceiver = object : android.content.BroadcastReceiver() {
         override fun onReceive(context: android.content.Context, intent: android.content.Intent) {
             if (intent.action != ACTION_THOR_MODE_CHANGED) return
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
                     thorPlayerMode = manager.launchPanel(this@MainActivity)
                     if (!thorPlayerMode) appPreferences().setThorMode(false)
                 } else {
+                    dev.lelonio.square.thor.display.ThorPresentation.reset()
                     manager.closePair(this@MainActivity)
                     thorPlayerMode = false
                 }
@@ -102,6 +104,20 @@ class MainActivity : ComponentActivity() {
             app.preferences.thorMode.value &&
             thorDisplays.launchPanel(this)
         thorDisplays.close()
+        lifecycleScope.launch {
+            dev.lelonio.square.thor.display.ThorPresentation.mode.collect { mode ->
+                lowerOnly = mode == dev.lelonio.square.thor.display.ThorPresentation.Mode.LOWER_ONLY
+                if (thorPlayerMode && lowerOnly) {
+                    val manager = dev.lelonio.square.thor.display.ThorDisplayManager(this@MainActivity)
+                    try {
+                        if (manager.launchPanel(this@MainActivity)) {
+                            if (!moveTaskToBack(true)) dev.lelonio.square.thor.display.ThorPresentation.reset()
+                        }
+                        else dev.lelonio.square.thor.display.ThorPresentation.reset()
+                    } finally { manager.close() }
+                }
+            }
+        }
         // Transparent bars; SquareTheme sets the icon colour, because it is the
         // only place that knows whether the app is currently light or dark.
         enableEdgeToEdge(
@@ -134,7 +150,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             dev.lelonio.square.ui.theme.ChosenTheme {
-                if (thorPlayerMode) {
+                if (thorPlayerMode && lowerOnly) {
+                    // Release this composition's video surfaces while the upper task is hidden.
+                    androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier)
+                } else if (thorPlayerMode) {
                     dev.lelonio.square.ui.theme.SquareTheme(darkTheme = true) {
                         SquareApp(
                             player = controller,
@@ -144,6 +163,10 @@ class MainActivity : ComponentActivity() {
                             openPlayer = openPlayer,
                             link = link,
                             playerOnly = true,
+                            onSwitchDisplay = {
+                                dev.lelonio.square.thor.display.ThorPresentation.select(
+                                    dev.lelonio.square.thor.display.ThorPresentation.Mode.LOWER_ONLY)
+                            },
                         )
                     }
                 } else {
@@ -336,6 +359,20 @@ class MainActivity : ComponentActivity() {
             getBooleanExtra(dev.lelonio.square.playback.EXTRA_OPEN_PLAYER, false)
 
     override fun onStart() {
+        if (!appPreferences().thorMode.value && thorPlayerMode) {
+            thorPlayerMode = false
+            lowerOnly = false
+            dev.lelonio.square.thor.display.ThorPresentation.reset()
+            val manager = dev.lelonio.square.thor.display.ThorDisplayManager(this)
+            try { manager.closePair(this) } finally { manager.close() }
+        }
+        if (thorPlayerMode && lowerOnly) {
+            val manager = dev.lelonio.square.thor.display.ThorDisplayManager(this)
+            try {
+                if (manager.launchPanel(this)) window.decorView.post { if (!moveTaskToBack(true)) dev.lelonio.square.thor.display.ThorPresentation.reset() }
+                else dev.lelonio.square.thor.display.ThorPresentation.reset()
+            } finally { manager.close() }
+        }
         touchRefreshRate.hold()
         dev.lelonio.square.data.RemoteConnect.onAppOpened()
         androidx.core.content.ContextCompat.registerReceiver(

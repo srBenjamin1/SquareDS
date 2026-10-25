@@ -91,9 +91,9 @@ class LocalVisualResolver(private val music: LocalMusicRepository, private val a
             LocalVisualDiagnostics.record(LocalVisualDiagnostics.Stage.OFFLINE, track.uri)
             return@withLock null
         }
-        val signature = LocalVisualMatching.evidence(listOf(track))
+        val signature = LocalMotionPolicy.evidence(track, java.util.Locale.getDefault().country.lowercase().ifBlank { "us" })
         val cached = music.awaitCatalog().snapshot.motions.firstOrNull { it.trackUri == track.uri && it.evidence == signature }
-        if (cached != null && (cached.artwork != null || System.currentTimeMillis() - cached.checkedAt < week)) {
+        if (cached != null && LocalMotionPolicy.reusable(cached, signature, System.currentTimeMillis())) {
             LocalVisualDiagnostics.record(LocalVisualDiagnostics.Stage.CACHE_HIT, track.uri)
             return@withLock cached.artwork
         }

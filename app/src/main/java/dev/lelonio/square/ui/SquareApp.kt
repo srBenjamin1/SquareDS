@@ -435,6 +435,8 @@ fun SquareApp(
     viewModel: MainViewModel = viewModel(),
     showExpandedPlayer: Boolean = true,
     playerOnly: Boolean = false,
+    lowerDisplayOnly: Boolean = false,
+    onSwitchDisplay: (() -> Unit)? = null,
     /** Owned by ThorActivity; never restored from the conventional player preference. */
     toolsOpen: Boolean = false,
     onToolsOpenChange: (Boolean) -> Unit = {},
@@ -1021,7 +1023,7 @@ fun SquareApp(
     // The saved expansion belongs to the conventional single-screen player.
     // Thor's lower display has no expanded player, so restoring it there
     // would hide the tabs and mini player behind a sheet that is never drawn.
-    val expand = remember(showExpandedPlayer, playerOnly) {
+    val expand = remember {
         Animatable(
             if (showExpandedPlayer && (playerOnly || preferences.playerWasOpen())) 1f else 0f,
         )
@@ -1076,10 +1078,10 @@ fun SquareApp(
 
     // Remembered for the next launch. Written when the animation settles rather
     // than on every frame of the drag.
-    LaunchedEffect(showExpandedPlayer, playerOnly) {
+    LaunchedEffect(showExpandedPlayer, playerOnly, lowerDisplayOnly) {
         // Neither Thor display owns the conventional player's saved state:
         // the upper player is always open and the lower one is never drawn.
-        if (!showExpandedPlayer || playerOnly) return@LaunchedEffect
+        if (!showExpandedPlayer || playerOnly || lowerDisplayOnly) return@LaunchedEffect
         snapshotFlow { expand.isRunning to expand.value }
             .collect { (running, value) ->
                 if (!running) preferences.setPlayerOpen(value > 0.5f)
@@ -1116,13 +1118,17 @@ fun SquareApp(
             }
         }
     }
-    LaunchedEffect(playerOnly, playback.hasItem) {
-        if (playerOnly && playback.hasItem && expand.value < 0.999f) {
+    LaunchedEffect(playerOnly, lowerDisplayOnly, playback.hasItem) {
+        if ((playerOnly || lowerDisplayOnly) && playback.hasItem && expand.value < 0.999f) {
             expand.animateTo(1f, expandSpec)
         }
     }
-    LaunchedEffect(playerOnly) {
-        if (playerOnly && expand.value < 0.999f) expand.snapTo(1f)
+    LaunchedEffect(showExpandedPlayer, playerOnly, lowerDisplayOnly) {
+        if (thorInput != null) {
+            restoreThorNavigationChrome(lowerDisplayOnly, playback.hasItem, expand, toolsExpand) { onToolsOpenChange(false) }
+        } else if (playerOnly && expand.value < 0.999f) {
+            expand.snapTo(1f)
+        }
     }
 
     // Measured rather than assumed. The constant this replaced was 62dp while
@@ -1497,7 +1503,7 @@ fun SquareApp(
     })
 
     androidx.compose.runtime.CompositionLocalProvider(
-        LocalThorEnabled provides (playerOnly || !showExpandedPlayer),
+        LocalThorEnabled provides (playerOnly || thorInput != null || !showExpandedPlayer),
         LocalThorInputSession provides thorInput,
         LocalThorFocusRegistry provides thorFocusRegistry,
         LocalThorHintBackdrop provides artBackdrop,
@@ -2548,7 +2554,7 @@ fun SquareApp(
                         // player still swallows the taps meant for the
                         // transport.
                         .graphicsLayer {
-                            alpha = (1f - expand.value * 3f).coerceIn(0f, 1f) * chrome
+                            alpha = navigationChromeAlpha(showExpandedPlayer && playback.hasItem, expand.value, chrome)
                         }
                         .onSizeChanged {
                             if (!tabBarScroll.isInline) {
@@ -3383,6 +3389,8 @@ fun SquareApp(
                           ) {
                             dev.lelonio.square.thor.ui.UpperPlayerFocusScene(enabled = playerOnly) {
                             PlayerScreen(
+                                onSwitchDisplay = onSwitchDisplay,
+                                lowerDisplayOnly = lowerDisplayOnly,
                                 role = when {
                                     !showExpandedPlayer -> dev.lelonio.square.ui.player.PlayerVisualRole.THOR_BOTTOM_TOOLS
                                     playerOnly -> dev.lelonio.square.ui.player.PlayerVisualRole.THOR_TOP
@@ -3569,6 +3577,7 @@ fun SquareApp(
                                 coverMotionUrl = dev.lelonio.square.ui.player.PlayerVisualPolicy.motionUrl(
                                     nowPlayingArt, landscape = false, enabled = dev.lelonio.square.ui.player.PlayerVisualPolicy.motionEnabledForTrack(playback.mediaId, canvasEnabled, coverSource, offlineNow, landscape), source = coverSource,
                                     visible = showExpandedPlayer, musicVideo = videoOn || spotifyVideoOn || spotifyVideoLoading,
+                                    localTrack = dev.lelonio.square.data.LocalLibrary.isLocal(playback.mediaId.orEmpty()),
                                 ),
                                 coverLandscapeMotionUrl = dev.lelonio.square.ui.player.PlayerVisualPolicy.motionUrl(
                                     nowPlayingArt, landscape = true, enabled = dev.lelonio.square.ui.player.PlayerVisualPolicy.motionEnabledForTrack(playback.mediaId, canvasEnabled, coverSource, offlineNow, landscape), source = coverSource,

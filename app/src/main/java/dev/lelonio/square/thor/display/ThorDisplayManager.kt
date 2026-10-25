@@ -95,6 +95,19 @@ class ThorDisplayManager(context: Context) {
         }
     }
 
+    /** Bring back the existing singleTask upper activity; no player/session is recreated. */
+    fun restorePlayer(activity: Activity): Boolean = try {
+        activity.startActivity(
+            Intent(activity, dev.lelonio.square.ui.MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            ActivityOptions.makeBasic().setLaunchDisplayId(readDisplays().primaryId).toBundle(),
+        )
+        true
+    } catch (failure: RuntimeException) {
+        Log.w(TAG, "Unable to restore upper surface", failure)
+        false
+    }
+
     fun closePair(context: Context) {
         context.sendBroadcast(
             Intent(ThorActivity.ACTION_CLOSE).setPackage(context.packageName),

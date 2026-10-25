@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastRoundToInt
@@ -72,13 +73,29 @@ fun LiquidSlider(
     // current cover, so the colours are parameters with the upstream values as
     // defaults.
     accentColor: Color = Color(0xFF0091FF),
-    trackColor: Color = Color(0xFF787880).copy(0.36f)
+    trackColor: Color = Color(0xFF787880).copy(0.36f),
+    // LOCAL CHANGE: told once, when the finger lifts. For a slider whose every
+    // value is expensive to apply — a seek — and that wants only the last one.
+    onValueChangeFinished: () -> Unit = {},
+    // LOCAL CHANGE: upstream's thumb is a 40 by 24 capsule. Equal sides make it
+    // a circle, which is what the playback position wants.
+    thumbSize: DpSize = DpSize(40f.dp, 24f.dp),
+    // LOCAL CHANGE: the thumb's scale at rest and while held, upstream's as
+    // defaults. A thumb meant to sit small is drawn at its held size and scaled
+    // down, rather than drawn small: the lens is sized in dp, and a lens near
+    // half the pane it sits in is what hangs the refraction shader.
+    thumbRestScale: Float = 1f,
+    thumbPressedScale: Float = 1.5f,
+    controllerStep: Float = (valueRange.endInclusive - valueRange.start) / 40f,
 ) {
 
     val trackBackdrop = rememberLayerBackdrop()
 
     BoxWithConstraints(
-        modifier.thorAdjustable(value, valueRange, onChange = onValueChange).fillMaxWidth(),
+        modifier.thorAdjustable(value, valueRange, step = controllerStep, onChange = {
+            onValueChange(it)
+            onValueChangeFinished()
+        }).fillMaxWidth(),
         contentAlignment = Alignment.CenterStart
     ) {
         val trackWidth = constraints.maxWidth
@@ -92,6 +109,12 @@ fun LiquidSlider(
         // one sent the other as it was when the panel opened, and a pitch set
         // a moment ago sprang back to a value nobody had chosen.
         val latestOnValueChange by rememberUpdatedState(onValueChange)
+        val latestOnFinished by rememberUpdatedState(onValueChangeFinished)
+        // LOCAL CHANGE: the value too, for the same reason. The effect below
+        // is started once, and it went on reading the first lambda it was
+        // given: a progress bar whose song turned into its video kept drawing
+        // the thumb against the song's length, well past where the video was.
+        val latestValue by rememberUpdatedState(value)
         val animationScope = rememberCoroutineScope()
         var didDrag by remember { mutableStateOf(false) }
         val dampedDragAnimation = remember(animationScope) {
@@ -100,8 +123,8 @@ fun LiquidSlider(
                 initialValue = value(),
                 valueRange = valueRange,
                 visibilityThreshold = visibilityThreshold,
-                initialScale = 1f,
-                pressedScale = 1.5f,
+                initialScale = thumbRestScale,
+                pressedScale = thumbPressedScale,
                 onDragStarted = {},
                 onDragStopped = {
                     if (didDrag) {
@@ -122,7 +145,7 @@ fun LiquidSlider(
             )
         }
         LaunchedEffect(dampedDragAnimation) {
-            snapshotFlow { value() }
+            snapshotFlow { latestValue() }
                 .collectLatest { value ->
                     if (dampedDragAnimation.targetValue != value) {
                         dampedDragAnimation.updateValue(value)
@@ -192,6 +215,7 @@ fun LiquidSlider(
                             // and lensed after the finger is gone reads as the
                             // control being stuck mid-drag.
                             dampedDragAnimation.release()
+                            latestOnFinished()
                         }
                     }
                 }
@@ -214,6 +238,7 @@ fun LiquidSlider(
                                     .coerceIn(valueRange)
                             dampedDragAnimation.animateToValue(targetValue)
                             latestOnValueChange(targetValue)
+                            latestOnFinished()
                         }
                     }
                     .height(6f.dp)
@@ -298,7 +323,9 @@ fun LiquidSlider(
                         drawRect(Color.White.copy(alpha = 1f - progress))
                     }
                 )
-                .size(40f.dp, 24f.dp)
+                // Required rather than asked for: a thumb taller than the
+                // slider it sits on keeps its size and overhangs the track.
+                .requiredSize(thumbSize)
         )
     }
 }

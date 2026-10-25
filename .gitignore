@@ -16,6 +16,8 @@ app/.cxx/
 
 # Local agent settings: machine-specific, and no business in a public repo
 .claude/
+.codex/
+.github/copilot-instructions.md
 
 # Signing. The keystore and its passwords never go near the repository.
 *.jks

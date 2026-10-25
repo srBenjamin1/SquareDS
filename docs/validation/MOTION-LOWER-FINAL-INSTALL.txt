@@ -1,0 +1,16 @@
+Installed APK SHA256 70589e0b3c5e499d6217b1ebb9bdb13693a71e43e2187d475d73d6a52cce52a9
+Current process FATAL EXCEPTION count: 0
+--------- beginning of main
+D/SquareDSLocalVisual(20394): stage=CACHE_HIT key=357fba4a
+D/SquareDSLocalVisual(20394): stage=URL_DELIVERED key=357fba4a count=2
+D/SquareDSLocalVisual(20394): stage=SURFACE_ATTACHED key=b0644ad6
+D/SquareDSLocalVisual(20394): stage=COMPONENT_CREATED key=b0644ad6
+D/SquareDSLocalVisual(20394): stage=CACHE_HIT key=357fba4a
+D/SquareDSLocalVisual(20394): stage=URL_DELIVERED key=357fba4a count=2
+D/SquareDSLocalVisual(20394): stage=BLOCKED_VISUAL_MODE key=357fba4a
+D/SquareDSLocalVisual(20394): stage=FIRST_FRAME key=b0644ad6
+D/SquareDSLocalVisual(20394): stage=PLAYER_READY key=b0644ad6
+D/SquareDSLocalVisual(20394): stage=CACHE_HIT key=357fba4a
+D/SquareDSLocalVisual(20394): stage=URL_DELIVERED key=357fba4a count=2
+D/SquareDSLocalVisual(20394): stage=CACHE_HIT key=357fba4a
+D/SquareDSLocalVisual(20394): stage=URL_DELIVERED key=357fba4a count=2

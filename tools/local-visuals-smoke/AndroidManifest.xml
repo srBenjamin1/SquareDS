@@ -3,4 +3,6 @@
     <application android:label="SquareDS temporary visual checks" android:debuggable="true" />
     <instrumentation android:name="dev.lelonio.square.visualsmoke.VisualSmoke" android:targetPackage="dev.lelonio.square" />
     <instrumentation android:name="dev.lelonio.square.visualsmoke.LibrarySmoke" android:targetPackage="dev.lelonio.square" />
+    <instrumentation android:name="dev.lelonio.square.visualsmoke.MotionSmoke" android:targetPackage="dev.lelonio.square" />
+    <instrumentation android:name="dev.lelonio.square.visualsmoke.ThorModeSmoke" android:targetPackage="dev.lelonio.square" />
 </manifest>

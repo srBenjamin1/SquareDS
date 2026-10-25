@@ -1,0 +1,7 @@
+Comando: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-configuration-cache
+{'tests': 327, 'failures': 0, 'errors': 0, 'skipped': 0}
+BUILD SUCCESSFUL in 25s
+72 actionable tasks: 12 executed, 60 up-to-date
+
+APK ARM64 SHA-256: 72dcac117a51073abd8d66b469bd023c51a267aaadaf4858d951615c6a947397
+Pruebas instrumentadas/físicas de este APK: no ejecutadas.

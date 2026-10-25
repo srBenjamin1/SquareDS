@@ -57,6 +57,8 @@ fun MotionCover(
     playing: Boolean = true,
     /** Song cards contain the whole video; page headers retain their original crop. */
     fit: Boolean = false,
+    onFirstFrame: (() -> Unit)? = null,
+    onFailure: ((Int) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -87,20 +89,39 @@ fun MotionCover(
     // the cover beginning to move, not a second picture arriving on top.
     var firstFrame by remember(url) { mutableStateOf(false) }
     var failed by remember(url) { mutableStateOf(false) }
+    val firstFrameCallback by rememberUpdatedState(onFirstFrame)
+    val failureCallback by rememberUpdatedState(onFailure)
     DisposableEffect(player) {
+        dev.lelonio.square.data.local.LocalVisualDiagnostics.record(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.COMPONENT_CREATED, url)
+        var readyLogged = false
         val listener = object : Player.Listener {
             override fun onRenderedFirstFrame() {
-                dev.lelonio.square.data.local.LocalVisualDiagnostics.record(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.FIRST_FRAME, url)
+                if (!firstFrame) {
+                    dev.lelonio.square.data.local.LocalVisualDiagnostics.record(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.FIRST_FRAME, url)
+                    firstFrameCallback?.invoke()
+                }
                 firstFrame = true
+            }
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY && !readyLogged) {
+                    readyLogged = true
+                    dev.lelonio.square.data.local.LocalVisualDiagnostics.record(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.PLAYER_READY, url)
+                }
             }
             override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
                 dev.lelonio.square.data.local.LocalVisualDiagnostics.record(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.LOAD_ERROR, url, code = error.errorCode)
                 failed = true
+                failureCallback?.invoke(error.errorCode)
                 player.pause()
             }
         }
         player.addListener(listener)
         onDispose { player.removeListener(listener) }
+    }
+    LaunchedEffect(player) {
+        delay(20_000)
+        if (!firstFrame && !failed) dev.lelonio.square.data.local.LocalVisualDiagnostics.record(
+            dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.FIRST_FRAME_TIMEOUT, url)
     }
     val appear by androidx.compose.animation.core.animateFloatAsState(
         targetValue = if (firstFrame && !failed) 1f else 0f,
@@ -182,6 +203,7 @@ fun MotionCover(
                 setShutterBackgroundColor(android.graphics.Color.TRANSPARENT)
                 setBackgroundColor(android.graphics.Color.TRANSPARENT)
                 this.player = player
+                dev.lelonio.square.data.local.LocalVisualDiagnostics.record(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.SURFACE_ATTACHED, url)
                 surface[0] = videoSurfaceView as? android.view.TextureView
             }
         },

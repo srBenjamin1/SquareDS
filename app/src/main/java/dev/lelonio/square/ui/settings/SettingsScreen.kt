@@ -761,6 +761,28 @@ fun SettingsScreen(
                         )
                     },
                 )
+                if (thor) {
+                    val presentation by dev.lelonio.square.thor.display.ThorPresentation.mode.collectAsStateWithLifecycle()
+                    RowDivider()
+                    DownloadSwitch(
+                        label = stringResource(R.string.thor_lower_player),
+                        checked = presentation == dev.lelonio.square.thor.display.ThorPresentation.Mode.LOWER_ONLY,
+                        backdrop = backdrop,
+                        icon = PhosphorIcons.Regular.SlidersHorizontal,
+                        onChange = { lower ->
+                            if (lower) dev.lelonio.square.thor.display.ThorPresentation.select(dev.lelonio.square.thor.display.ThorPresentation.Mode.LOWER_ONLY)
+                            else {
+                                dev.lelonio.square.thor.display.ThorPresentation.reset()
+                                val activity = generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }
+                                    .filterIsInstance<android.app.Activity>().firstOrNull()
+                                if (activity != null) {
+                                    val manager = dev.lelonio.square.thor.display.ThorDisplayManager(activity)
+                                    try { manager.restorePlayer(activity) } finally { manager.close() }
+                                }
+                            }
+                        },
+                    )
+                }
                 RowDivider()
                 ThorDisplaySelection()
                 RowDivider()

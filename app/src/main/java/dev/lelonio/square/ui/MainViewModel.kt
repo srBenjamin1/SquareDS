@@ -5839,7 +5839,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         ?: LocalTrack(uri?.substringAfterLast(':')?.toLongOrNull() ?: return@launch,
                             "", title, artist, album, durationMs = durationMs)
                     val found = container.localVisuals.motion(local)
-                    if (nowPlayingArtJob?.isActive == true) _nowPlayingArt.value = found
+                    // A cache hit can finish inline before launch returns and assigns the Job field.
+                    currentCoroutineContext().ensureActive()
+                    run {
+                        _nowPlayingArt.value = found
+                        LocalVisualDiagnostics.record(LocalVisualDiagnostics.Stage.URL_DELIVERED, local.uri,
+                            (if (found?.motionUrl != null) 1 else 0) + (if (found?.motionSquareUrl != null) 2 else 0))
+                    }
                 } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e }
             }
             return

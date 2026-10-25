@@ -792,4 +792,6 @@
     <string name="local_remove_folder">Remove folder</string>
     <string name="local_identity_review">New songs contradict this identity · Review association</string>
     <string name="local_change_association">Change artist association</string>
+    <string name="thor_lower_player">Player on lower screen</string>
+    <string name="thor_restore_dual">Restore dual-screen mode</string>
 </resources>

@@ -1,0 +1,2 @@
+PASS lower mode: one MainActivity, one ThorActivity; queue preserved; touch Queue/Effects/Credits/Lyrics
+PASS dual -> lower -> dual via real buttons; one activity per role; queue/index, position and play intent preserved; normal UI URL_DELIVERED and FIRST_FRAME

@@ -7,10 +7,12 @@ internal object PlayerVisualPolicy {
     fun motionUrl(
         artwork: AppleCatalog.Album?, landscape: Boolean, enabled: Boolean,
         source: PreferencesStore.CoverSource, visible: Boolean, musicVideo: Boolean,
+        localTrack: Boolean = false,
     ): String? = when {
         !enabled || !visible || musicVideo -> null
         landscape -> artwork?.motionSquareUrl ?: artwork?.motionUrl
-        source == PreferencesStore.CoverSource.APPLE_MUSIC -> artwork?.motionUrl
+        source == PreferencesStore.CoverSource.APPLE_MUSIC ->
+            artwork?.motionUrl ?: artwork?.motionSquareUrl?.takeIf { localTrack }
         else -> null
     }
 

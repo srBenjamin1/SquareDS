@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableFloatStateOf
@@ -36,6 +37,12 @@ class ThorActivity : ComponentActivity() {
     private val closeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_CLOSE) finish()
+            else if (intent.action == dev.lelonio.square.ui.ACTION_THOR_MODE_CHANGED && !intent.getBooleanExtra("enabled", false)) {
+                dev.lelonio.square.thor.display.ThorPresentation.reset()
+                val manager = dev.lelonio.square.thor.display.ThorDisplayManager(this@ThorActivity)
+                try { manager.restorePlayer(this@ThorActivity) } finally { manager.close() }
+                finish()
+            }
         }
     }
 
@@ -44,7 +51,7 @@ class ThorActivity : ComponentActivity() {
         ContextCompat.registerReceiver(
             this,
             closeReceiver,
-            IntentFilter(ACTION_CLOSE),
+            IntentFilter(ACTION_CLOSE).apply { addAction(dev.lelonio.square.ui.ACTION_THOR_MODE_CHANGED) },
             ContextCompat.RECEIVER_NOT_EXPORTED,
         )
         input = ThorInputDispatcher(
@@ -58,10 +65,23 @@ class ThorActivity : ComponentActivity() {
         setContent {
             dev.lelonio.square.ui.theme.ChosenTheme {
                 dev.lelonio.square.ui.theme.SquareTheme(darkTheme = true) {
+                    val mode by dev.lelonio.square.thor.display.ThorPresentation.mode.collectAsStateWithLifecycle()
+                    val lowerOnly = mode == dev.lelonio.square.thor.display.ThorPresentation.Mode.LOWER_ONLY
                     SquareApp(
                         player = controller,
                         thorInput = inputSession,
-                        showExpandedPlayer = false,
+                        showExpandedPlayer = lowerOnly,
+                        lowerDisplayOnly = lowerOnly,
+                        onSwitchDisplay = {
+                            val manager = dev.lelonio.square.thor.display.ThorDisplayManager(this)
+                            try {
+                                dev.lelonio.square.thor.display.ThorPresentation.reset()
+                                if (!manager.restorePlayer(this)) {
+                                    dev.lelonio.square.thor.display.ThorPresentation.select(
+                                        dev.lelonio.square.thor.display.ThorPresentation.Mode.LOWER_ONLY)
+                                }
+                            } finally { manager.close() }
+                        },
                         toolsOpen = toolsOpen,
                         onToolsOpenChange = { toolsOpen = it },
                         onPlay = { tracks, index, _, _, _, positionMs ->

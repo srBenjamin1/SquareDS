@@ -1,0 +1,4 @@
+Command: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-configuration-cache
+{'tests': 339, 'failures': 0, 'errors': 0, 'skipped': 0}
+BUILD SUCCESSFUL
+APK ARM64 SHA256 70589e0b3c5e499d6217b1ebb9bdb13693a71e43e2187d475d73d6a52cce52a9

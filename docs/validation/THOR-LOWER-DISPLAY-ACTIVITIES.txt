@@ -1,0 +1,6 @@
+    topResumedActivity=ActivityRecord{a12957 u0 dev.lelonio.square/.thor.ui.ThorActivity} t9273}
+      mActivityComponent=dev.lelonio.square/.thor.ui.ThorActivity
+    Resumed: ActivityRecord{a12957 u0 dev.lelonio.square/.thor.ui.ThorActivity} t9273}
+      topResumedActivity=ActivityRecord{455987b u0 rip.moth.cocoonshell/.MainActivity} t9239}
+      mActivityComponent=dev.lelonio.square/.ui.MainActivity
+    Resumed: ActivityRecord{455987b u0 rip.moth.cocoonshell/.MainActivity} t9239}

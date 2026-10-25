@@ -729,4 +729,6 @@
     <string name="local_remove_folder">Quitar carpeta</string>
     <string name="local_identity_review">Nuevas canciones contradicen esta identidad · Revisar asociación</string>
     <string name="local_change_association">Cambiar asociación de artista</string>
+    <string name="thor_lower_player">Reproductor en pantalla inferior</string>
+    <string name="thor_restore_dual">Restaurar modo dual-screen</string>
 </resources>

@@ -87,10 +87,10 @@ fun NowPlayingSheet(
     //
     // These two are derived rather than read directly so a recomposition
     // happens when the answer *changes*, not when the number does.
-    val expandedVisible by remember { derivedStateOf { progress.value > 0.001f } }
+    val expandedVisible by remember(progress) { derivedStateOf { progress.value > 0.001f } }
 
     // True only at the two ends of the travel; see LocalGlassEnabled.
-    val settled by remember {
+    val settled by remember(progress) {
         derivedStateOf { progress.value <= 0.001f || progress.value >= 0.999f }
     }
 

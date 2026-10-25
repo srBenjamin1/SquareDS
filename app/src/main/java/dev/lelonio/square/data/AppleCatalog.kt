@@ -119,10 +119,15 @@ object AppleCatalog {
      * catalogue exists to enrich the visual experience — the app works correctly
      * without it — and reaching out for large editorial photos over mobile data
      * is not a trade the listener has agreed to. A cached answer is always used
-     * regardless of connection type; only a live lookup is skipped.
+     * regardless of connection type; only a live lookup is skipped. The one
+     * exception is an artist's drawn name; see artist.
      */
-    private fun mayAsk(): Boolean {
-        if (dev.lelonio.square.playback.OfflineMode.active.value) return false
+    private fun mayAsk(allowMetered: Boolean = false): Boolean =
+        dev.lelonio.square.data.local.LocalMotionPolicy.catalogAllowed(
+            dev.lelonio.square.playback.OfflineMode.active.value, unmetered(), allowMetered)
+
+    /** Wi-Fi or ethernet, or a connection that cannot be told apart from one. */
+    private fun unmetered(): Boolean {
         // Check metered status via the connectivity service.
         val connectivity = connectivityRef?.get()
         if (connectivity != null) {
@@ -244,7 +249,28 @@ object AppleCatalog {
             return kept
         }
 
-        if (!mayAsk()) return null
+        if (dev.lelonio.square.playback.OfflineMode.active.value) return null
+
+        // On mobile data the page still gets the name drawn: one search and a
+        // PNG of a few tens of kilobytes, against a photograph many times that.
+        // The photograph and the colours filed with it are left for Wi-Fi —
+        // Apple's colours over Spotify's photo would be a page tinted for a
+        // different picture. Kept for this run only, and under its own key, so
+        // the first visit on Wi-Fi still asks for the whole page.
+        if (!unmetered()) {
+            val lite = "logo $key"
+            synchronized(cache) { if (cache.containsKey(lite)) return cache[lite] as Artist? }
+            val found = ask(name) { lookUpArtist(name, storefront) }
+                ?.copy(
+                    heroUrl = null,
+                    heroAspect = null,
+                    bgColor = null,
+                    textHex = null,
+                    inkPalette = emptyList(),
+                )
+            synchronized(cache) { cache[lite] = found }
+            return found
+        }
 
         val found = ask(name) { lookUpArtist(name, storefront) }
 
@@ -635,20 +661,22 @@ object AppleCatalog {
     /** Existing Apple API, with identities and strict local evidence instead of name-only artwork matching. */
     private val localCandidateLock = Mutex()
     private val localCandidateCache = linkedMapOf<String, Pair<Long, List<dev.lelonio.square.data.local.LocalSongCandidate>>>()
-    suspend fun localCandidates(track: dev.lelonio.square.data.local.LocalTrack, forceRefresh: Boolean = false): List<dev.lelonio.square.data.local.LocalSongCandidate>? = localCandidateLock.withLock {
-        val key = dev.lelonio.square.data.local.LocalVisualMatching.evidence(listOf(track))
-        localCandidateCache[key]?.takeIf { !forceRefresh && System.currentTimeMillis() - it.first < 86_400_000 }?.let { return@withLock it.second }
-        if (!mayAsk()) return@withLock null
+    suspend fun localCandidates(track: dev.lelonio.square.data.local.LocalTrack, forceRefresh: Boolean = false, allowMetered: Boolean = false): List<dev.lelonio.square.data.local.LocalSongCandidate>? = localCandidateLock.withLock {
+        val key = dev.lelonio.square.data.local.LocalMotionPolicy.evidence(track, storefront())
+        localCandidateCache[key]?.takeIf { !forceRefresh && dev.lelonio.square.data.local.LocalMotionPolicy.candidatesReusable(it.first, it.second, System.currentTimeMillis()) }?.let { return@withLock it.second }
+        if (!mayAsk(allowMetered)) return@withLock null
         if (track.artist.isBlank() || track.title.isBlank()) return@withLock emptyList()
         val found = ask("local identity") {
-            (search("${track.artist} ${track.title}", "songs", storefront(), identities = true) ?: return@ask null).mapNotNull { element ->
-                val row = element.jsonObject
-                val a = row["attributes"] as? JsonObject ?: return@mapNotNull null
-                fun text(key: String) = (a[key] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty()
-                fun identity(kind: String): String = (row["relationships"] as? JsonObject)?.get(kind)?.jsonObject
-                    ?.get("data")?.jsonArray?.let { data -> if (data.size != 1) null else data.firstOrNull() }?.jsonObject?.get("id")?.jsonPrimitive?.content.orEmpty()
-                dev.lelonio.square.data.local.LocalSongCandidate(row["id"]?.jsonPrimitive?.content.orEmpty(), text("name"),
-                    text("artistName"), text("albumName"), text("durationInMillis").toLongOrNull() ?: 0, identity("artists"), identity("albums"))
+            dev.lelonio.square.data.local.LocalMotionPolicy.candidates(track) { term ->
+                (search(term, "songs", storefront(), identities = true, allowMetered = allowMetered) ?: return@candidates null).mapNotNull { element ->
+                    val row = element.jsonObject
+                    val a = row["attributes"] as? JsonObject ?: return@mapNotNull null
+                    fun text(key: String) = (a[key] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty()
+                    fun identity(kind: String): String = (row["relationships"] as? JsonObject)?.get(kind)?.jsonObject
+                        ?.get("data")?.jsonArray?.let { data -> if (data.size != 1) null else data.firstOrNull() }?.jsonObject?.get("id")?.jsonPrimitive?.content.orEmpty()
+                    dev.lelonio.square.data.local.LocalSongCandidate(row["id"]?.jsonPrimitive?.content.orEmpty(), text("name"),
+                        text("artistName"), text("albumName"), text("durationInMillis").toLongOrNull() ?: 0, identity("artists"), identity("albums"))
+                }
             }
         }
         if (found != null) {
@@ -674,16 +702,58 @@ object AppleCatalog {
         }
     }
 
+    /** Local-only album lookup: song membership corroborates, but is not a prerequisite. */
+    private suspend fun localAlbumMotion(track: dev.lelonio.square.data.local.LocalTrack): Pair<String, Album?>? {
+        if (!mayAsk(allowMetered = true)) throw java.io.IOException("Catalog temporarily unavailable")
+        return ask("local album motion") {
+            val rows = search("${track.albumArtist.ifBlank { track.artist }} ${track.album}", "albums", storefront(), allowMetered = true)
+                ?: return@ask null
+            dev.lelonio.square.data.local.LocalVisualDiagnostics.record(
+                dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.ALBUM_SEARCH, track.uri, rows.size)
+            fun candidate(row: JsonObject): dev.lelonio.square.data.local.LocalAlbumCandidate? {
+                val a = row["attributes"] as? JsonObject ?: return null
+                val id = row["id"]?.jsonPrimitive?.content ?: return null
+                return dev.lelonio.square.data.local.LocalAlbumCandidate(id,
+                    a["name"]?.jsonPrimitive?.content.orEmpty(), a["artistName"]?.jsonPrimitive?.content.orEmpty(),
+                    a["releaseDate"]?.jsonPrimitive?.content?.take(4)?.toIntOrNull(), a["trackCount"]?.jsonPrimitive?.content?.toIntOrNull(),
+                    (row["relationships"] as? JsonObject)?.get("tracks")?.jsonObject?.get("data")?.jsonArray
+                        ?.mapNotNull { (it.jsonObject["attributes"] as? JsonObject)?.get("name")?.jsonPrimitive?.content }.orEmpty(),
+                    localMotionFromAttributes(a))
+            }
+            val ranked = dev.lelonio.square.data.local.LocalAlbumMatching.ranked(track, rows.mapNotNull { candidate(it.jsonObject) }).take(4)
+            if (ranked.isEmpty()) return@ask "" to null
+            val bearer = token(allowMetered = true) ?: return@ask null
+            val detailed = ranked.map { c ->
+                val body = get("$API/${storefront()}/albums/${c.id}?extend=editorialArtwork,editorialVideo&include=tracks", bearer)
+                    ?: throw java.io.IOException("Album metadata unavailable")
+                val row = json.parseToJsonElement(body).jsonObject["data"]?.jsonArray?.firstOrNull()?.jsonObject
+                    ?: throw java.io.IOException("Album metadata unavailable")
+                candidate(row) ?: throw java.io.IOException("Album metadata unavailable")
+            }
+            dev.lelonio.square.data.local.LocalAlbumMatching.motion(track, detailed) ?: ("" to null)
+        } ?: throw java.io.IOException("Album catalog temporarily unavailable")
+    }
+
     suspend fun localMotion(track: dev.lelonio.square.data.local.LocalTrack): Pair<String, Album?>? {
         val key = track.uri
         fun trace(stage: dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage, count: Int? = null) =
             dev.lelonio.square.data.local.LocalVisualDiagnostics.record(stage, key, count)
-        if (track.title.isBlank() || track.artist.isBlank()) {
+        if (track.albumArtist.ifBlank { track.artist }.isBlank() || (track.album.isBlank() && track.title.isBlank())) {
             trace(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.MISSING_METADATA)
             return null
         }
         trace(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.METADATA_READY)
-        val candidates = localCandidates(track) ?: throw java.io.IOException("Catalog temporarily unavailable")
+        if (track.album.isNotBlank()) {
+            val albumMatch = localAlbumMotion(track)
+            trace(when {
+                albumMatch == null || albumMatch.first.isBlank() -> dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.NO_MATCH
+                albumMatch.second != null -> dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.MOTION_AVAILABLE
+                else -> dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.NO_MOTION
+            })
+            // A known album must never silently turn into artwork for a compilation of the song.
+            return albumMatch?.takeIf { it.first.isNotBlank() }
+        }
+        val candidates = localCandidates(track, allowMetered = true) ?: throw java.io.IOException("Catalog temporarily unavailable")
         trace(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.SEARCH_RESULTS, candidates.size)
         val ids = dev.lelonio.square.data.local.LocalVisualMatching.ranked(track, candidates).map { it.albumId }.distinct()
         if (ids.isEmpty()) {
@@ -695,9 +765,9 @@ object AppleCatalog {
             trace(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.AMBIGUOUS, ids.size)
             return null
         }
-        if (!mayAsk()) throw java.io.IOException("Catalog temporarily unavailable")
+        if (!mayAsk(allowMetered = true)) throw java.io.IOException("Catalog temporarily unavailable")
         val albums = ask("local motion") {
-            val bearer = token() ?: return@ask null
+            val bearer = token(allowMetered = true) ?: return@ask null
             ids.map { id ->
                 val body = get("$API/${storefront()}/albums/$id?extend=editorialArtwork,editorialVideo", bearer) ?: return@ask null
                 val a = json.parseToJsonElement(body).jsonObject["data"]?.jsonArray?.firstOrNull()?.jsonObject?.get("attributes") as? JsonObject ?: return@ask null
@@ -708,19 +778,29 @@ object AppleCatalog {
                 if (dev.lelonio.square.data.local.normalizedLocal(artist) != dev.lelonio.square.data.local.normalizedLocal(expectedArtist)) return@ask null
                 // Parse video independently of static artwork. A motion-only row
                 // must not fail albumFromAttributes' remote static-cover checks.
-                Album(heroUrl = null, coverUrl = null,
-                    motionUrl = a.motion()?.get("video")?.jsonPrimitive?.content?.takeIf { it.startsWith("https://") },
-                    motionSquareUrl = squareMotionUrl(a))
+                localMotionFromAttributes(a)
             }
         } ?: throw java.io.IOException("Album metadata unavailable")
         trace(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.ALBUM_IDENTIFIED, albums.size)
-        val artwork = dev.lelonio.square.data.local.LocalVisualMatching.sharedMotion(albums)
+        val artwork = dev.lelonio.square.data.local.LocalMotionPolicy.motion(track, candidates, albums)
         if (artwork == null) {
             trace(if (albums.any { it.motionUrl != null || it.motionSquareUrl != null })
                 dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.AMBIGUOUS
                 else dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.NO_MOTION)
         } else trace(dev.lelonio.square.data.local.LocalVisualDiagnostics.Stage.MOTION_AVAILABLE)
         return ids.joinToString(",") to artwork
+    }
+
+    /** Select the first usable URL, rather than an empty preferred editorial row. */
+    internal fun localMotionFromAttributes(attributes: JsonObject): Album {
+        val video = attributes["editorialVideo"] as? JsonObject
+        val portrait = listOf("motionDetailTall", "motionTallVideo3x4", "motionDetailSquare")
+            .firstNotNullOfOrNull { key ->
+                val row = video?.get(key) as? JsonObject
+                (row?.get("video") as? kotlinx.serialization.json.JsonPrimitive)?.content
+                    ?.takeIf { it.startsWith("https://") }
+            }
+        return Album(heroUrl = null, coverUrl = null, motionUrl = portrait, motionSquareUrl = squareMotionUrl(attributes))
     }
 
     /** An artwork row's own proportions, width over height. */
@@ -776,8 +856,9 @@ object AppleCatalog {
         types: String,
         storefront: String,
         identities: Boolean = false,
+        allowMetered: Boolean = false,
     ): List<kotlinx.serialization.json.JsonElement>? {
-        val bearer = token() ?: return null
+        val bearer = token(allowMetered) ?: return null
         val url = "$API/$storefront/search" +
             "?term=${java.net.URLEncoder.encode(term, "UTF-8")}" +
             // Enough rows to see past a title's singles, remixes and live
@@ -819,7 +900,7 @@ object AppleCatalog {
      * way to know it has gone stale is a request being refused — which is what
      * clears it.
      */
-    private suspend fun token(): String? = tokenLock.withLock {
+    private suspend fun token(allowMetered: Boolean = false): String? = tokenLock.withLock {
         token?.let { return it }
 
         // The one written down last time, if it has not run out.
@@ -833,6 +914,10 @@ object AppleCatalog {
             token = it
             return it
         }
+
+        // Several megabytes for a logo of a few tens of kilobytes is not what
+        // mobile data is spent on; the next lookup on Wi-Fi fetches it.
+        if (!allowMetered && !unmetered()) return null
 
         val page = get(SITE, null) ?: return null
         // The player's own bundle, whichever hash it carries today.

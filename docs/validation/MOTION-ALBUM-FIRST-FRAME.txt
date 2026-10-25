@@ -1,0 +1,1 @@
+PASS Mama album -> policy -> MotionCover -> FIRST_FRAME
