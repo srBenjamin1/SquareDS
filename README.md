@@ -73,44 +73,53 @@ You can switch between dual-screen and lower-screen-only modes without restartin
 
 The default dual-screen presentation is restored when the application process restarts.
 
-## Screenshots
+## Screenshots & Demos
 
-SquareDS running on the AYN Thor.
+### SquareDS on AYN Thor
 
-### Dual-screen interface
+Real photos of SquareDS running on the AYN Thor.
 
-| Dual-screen experience | Music player |
-| :---: | :---: |
-| ![SquareDS on AYN Thor](docs/screenshots/IMG_20261020_041622466.jpg) | ![SquareDS music player](docs/screenshots/Screenshot_20261020-030401.png) |
+![SquareDS running on AYN Thor](docs/screenshots/IMG_20261020_041622466.jpg)
 
-| Navigation | Additional interface |
-| :---: | :---: |
-| ![SquareDS navigation](docs/screenshots/Screenshot_20261020-041140.png) | ![SquareDS interface](docs/screenshots/Screenshot_20261020-0412072.jpg) |
+![SquareDS dual-screen experience on AYN Thor](docs/screenshots/IMG_20261025_134427039.jpg)
 
-### New features
+### Navigation
+
+![SquareDS lower-screen navigation](docs/screenshots/Screenshot_20261025-132951.png)
+
+### Music sources and local playback
 
 | Music sources | Local music |
 | :---: | :---: |
-| ![SquareDS music source selection](docs/screenshots/Fuentes.png) | ![SquareDS local music playback](docs/screenshots/ReproduccionLocal.png) |
+| ![Spotify, YouTube Music and Local Music](docs/screenshots/Fuentes.png) | ![SquareDS local music playback](docs/screenshots/ReproduccionLocal.png) |
 
-| Lower-screen-only mode | Motion Artwork |
+### Lower-screen-only mode
+
+SquareDS can move its full player to the lower display, leaving the upper screen available for other applications.
+
+| Lower-screen player | Gaming on the upper screen |
 | :---: | :---: |
-| ![SquareDS lower-screen player](docs/screenshots/OnlyBottomScreen.png) | ![SquareDS Motion Artwork](docs/screenshots/Video-test.png) |
+| ![SquareDS lower-screen-only player](docs/screenshots/OnlyBottomScreen.png) | ![Game running on the upper screen while SquareDS plays music below](docs/screenshots/IMG_20261025_133443579.jpg) |
+
+### Apple Music Motion Artwork
+
+Animated album artwork is supported in landscape, including compatible local music.
+
+**[Watch the Motion Artwork demonstration](docs/screenshots/Motion%20Artwork.mp4)**
+
+### Music video playback
+
+SquareDS supports switching between music playback and compatible music videos.
+
+![SquareDS music video playback](docs/screenshots/Video-test.png)
 
 ### Additional screenshots
 
-| Screenshot 1 | Screenshot 2 | Screenshot 3 |
-| :---: | :---: | :---: |
-| ![AYN Thor additional screenshot](docs/screenshots/IMG_20261025_133443579.jpg) | ![AYN Thor additional screenshot](docs/screenshots/IMG_20261025_134427039.jpg) | ![AYN Thor additional screenshot](docs/screenshots/Screenshot_20261025-132951.png) |
+| Music player | Navigation |
+| :---: | :---: |
+| ![SquareDS original player interface](docs/screenshots/Screenshot_20261020-030401.png) | ![SquareDS original navigation interface](docs/screenshots/Screenshot_20261020-041140.png) |
 
-### Motion Artwork demonstration
-
-**[Watch the Apple Music Motion Artwork demo](docs/screenshots/Motion%20Artwork.mp4)**
-
-The video demonstrates animated artwork running in SquareDS top screen.
-
----
-
+![Additional SquareDS interface screenshot](docs/screenshots/Screenshot_20261020-0412072.jpg)
 ## Features
 
 ### Music sources
